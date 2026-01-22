@@ -1,0 +1,24 @@
+[
+  {
+    "traceId": "trace_1769032904176",
+    "patternLabel": "Sequential",
+    "params": {
+      "requested": {
+        "tempo": 100,
+        "accent ratio": "12.28%",
+        "gain": "-4.77 dB"
+      },
+      "effective": {
+        "tempo": 120,
+        "accent ratio": "10.00%",
+        "gain": "-4.77 dB"
+      }
+    },
+    "metrics": {
+      "integratedLufs": -30.39,
+      "lraEffective": 0.84,
+      "onsetDensity": 3.6
+    },
+    "enforcementStatus": "clamped"
+  }
+]
