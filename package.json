@@ -1,0 +1,34 @@
+{
+  "name": "musibubble-tokyo2020-mediapipe-pictogram",
+  "version": "1.0.0",
+  "description": "。",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node scripts/build-vercel.js",
+    "start": "npx serve src/frontend -l 3000"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yecon-27/MusiBubble-Tokyo2020-MediaPipe-Pictogram.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/yecon-27/MusiBubble-Tokyo2020-MediaPipe-Pictogram/issues"
+  },
+  "homepage": "https://github.com/yecon-27/MusiBubble-Tokyo2020-MediaPipe-Pictogram#readme",
+  "dependencies": {
+    "@magenta/music": "^1.23.1",
+    "@mediapipe/camera_utils": "^0.3.1675466862",
+    "@mediapipe/control_utils": "^0.6.1675466023",
+    "@mediapipe/drawing_utils": "^0.3.1675466124",
+    "@mediapipe/pose": "^0.5.1675469404",
+    "@tensorflow/tfjs": "^3.21.0"
+  }
+}

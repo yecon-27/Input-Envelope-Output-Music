@@ -1,0 +1,398 @@
+
+/* =========================================
+   Expert Audit Panel (DAW Style)
+   ========================================= */
+
+/* Overwrite generic debug-panel styles if needed, or just use nested specific styles */
+.debug-panel {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    width: 100%;
+}
+
+.audit-panel-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+    background: rgba(30, 30, 35, 0.7); /* Dark DAW background with transparency */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #e0e0e0;
+    font-family: 'Inter', system-ui, sans-serif;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+/* OOB Event - Red Pulse */
+.audit-panel-container.oob-alert {
+    box-shadow: 0 0 50px rgba(255, 50, 50, 0.2), inset 0 0 100px rgba(255, 0, 0, 0.05);
+    border-color: rgba(255, 80, 80, 0.4);
+    animation: oob-pulse 2s infinite;
+}
+
+@keyframes oob-pulse {
+    0% { border-color: rgba(255, 80, 80, 0.4); }
+    50% { border-color: rgba(255, 80, 80, 0.8); box-shadow: 0 0 70px rgba(255, 50, 50, 0.3); }
+    100% { border-color: rgba(255, 80, 80, 0.4); }
+}
+
+.oob-watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-15deg);
+    font-size: 3rem;
+    font-weight: 900;
+    color: rgba(255, 0, 0, 0.08);
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 0;
+    border: 4px solid rgba(255, 0, 0, 0.08);
+    padding: 20px 40px;
+    text-transform: uppercase;
+}
+
+/* Typography */
+.mono {
+    font-family: 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
+    letter-spacing: -0.02em;
+}
+
+/* 1. Header */
+.audit-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.audit-meta-group {
+    display: flex;
+    gap: 24px;
+}
+
+.meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.meta-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+
+.meta-value {
+    font-size: 14px;
+    color: #fff;
+    font-weight: 500;
+}
+
+.audit-status-group {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+}
+
+.status-orb-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status-orb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #00ff9d;
+    box-shadow: 0 0 10px #00ff9d;
+}
+
+.status-orb.fail {
+    background: #ff4757;
+    box-shadow: 0 0 10px #ff4757;
+}
+
+.status-text {
+    font-size: 12px;
+    font-weight: 700;
+    color: #00ff9d;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.status-orb.fail + .status-text {
+    color: #ff4757;
+}
+
+.confidence-meter {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 180px;
+}
+
+.meter-label {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 600;
+}
+
+.meter-track {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.meter-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+    transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.meter-value {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.6);
+    text-align: right;
+    margin-top: 2px;
+}
+
+/* 2. Grid Layout */
+.audit-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 16px;
+    height: 320px;
+}
+
+.audit-card {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.card-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Causality Map */
+.causality-visual-container {
+    flex: 1;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+.causality-connections {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.causality-col {
+    width: 35%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 2;
+}
+
+.col-label {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.3);
+    text-align: center;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.causality-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.9);
+    border-left: 3px solid transparent;
+    transition: all 0.2s;
+}
+
+.causality-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.causality-item.input-item { border-left-color: #ff9f43; }
+.causality-item.output-item { border-left-color: #54a0ff; text-align: right; border-left: none; border-right: 3px solid #54a0ff; }
+
+/* Safety Audit Wall */
+.constraint-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.constraint-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.constraint-item.pass { border-left: 3px solid #2ecc71; }
+.constraint-item.fail { border-left: 3px solid #ff4757; background: rgba(255, 71, 87, 0.1); }
+
+.constraint-icon { font-size: 16px; }
+
+.constraint-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.constraint-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.constraint-detail {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.constraint-count {
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* 3. Timeline */
+.timeline-card {
+    height: 140px;
+    flex: none; /* Don't stretch */
+}
+
+.timeline-visual-wrapper {
+    flex: 1;
+    position: relative;
+    background: rgba(0, 0, 0, 0.3);
+    margin: 10px;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+#audit-timeline-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* 4. Footer */
+.audit-footer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-top: 4px;
+}
+
+.audit-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+}
+
+.audit-btn.primary {
+    background: #0984e3;
+    color: white;
+    box-shadow: 0 4px 12px rgba(9, 132, 227, 0.3);
+}
+
+.audit-btn.primary:hover {
+    background: #0a7ccf;
+    transform: translateY(-1px);
+}
+
+.audit-btn.secondary {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.8);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.audit-btn.secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.spacer { flex: 1; }
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.1);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+    border-radius: 3px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.3);
+}

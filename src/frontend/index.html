@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bubble Popping Game</title>
+    <!-- Preload Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/music-params.css">
+    <style>
+      .click-trail {
+        position: absolute;
+        top: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        pointer-events: none;
+        font-size: 12px;
+        font-weight: 700;
+        /* click-trail 已禁用，隐藏容器 */
+        display: none;
+      }
+      .click-trail .trail-dot {
+        min-width: 18px;
+        min-height: 18px;
+        padding: 2px 6px;
+        border-radius: 10px;
+        color: #fff;
+        text-align: center;
+        line-height: 1;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.25);
+      }
+      .click-trail .trail-title {
+        color: #fff;
+        opacity: 0.8;
+      }
+      .game-main { position: relative; overflow: visible; }
+    </style>
+</head>
+<body>
+
+
+    <div class="game-container">
+        <div class="game-header">
+            <!-- Left: Mute (Panic) & Settings -->
+            <div class="header-section header-left">
+                <button id="panic-mute-btn" class="control-btn panic-btn hero-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
+                    <span style="margin-left:6px">静音</span>
+                </button>
+                <div class="divider-vertical"></div>
+                <button id="session-settings-btn" class="control-btn secondary-btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> 
+                    <span style="margin-left:6px">参数</span>
+                </button>
+                <button id="lang-toggle-btn" class="control-btn secondary-btn" style="display: none;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg> 
+                    <span style="margin-left:6px">中/EN</span>
+                </button>
+            </div>
+
+            <!-- Center: Progress -->
+            <div class="header-section header-center">
+                <div class="progress-indicator">
+                    <div class="progress-bar">
+                        <div id="progress-fill" class="progress-fill"></div>
+                    </div>
+                    <div class="time-remaining">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.6;">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <span id="countdown-display">60s</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Speed & Pause -->
+            <div class="header-section header-right">
+                <div class="speed-controls">
+                    <button id="slow-btn" class="speed-btn" title="慢速">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 19 2 12 11 5 11 19"></polygon><polygon points="22 19 13 12 22 5 22 19"></polygon></svg>
+                        <span class="speed-label">慢速</span>
+                    </button>
+                    <button id="normal-btn" class="speed-btn active" title="正常">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                        <span class="speed-label">正常</span>
+                    </button>
+                    <button id="fast-btn" class="speed-btn" title="快速">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 19 22 12 13 5 13 19"></polygon><polygon points="2 19 11 12 2 5 2 19"></polygon></svg>
+                        <span class="speed-label">快速</span>
+                    </button>
+                </div>
+                <div class="divider-vertical"></div>
+                <button id="pause-btn" class="control-btn primary-btn hero-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+                    <span style="margin-left:6px">暂停</span>
+                </button>
+                <!-- Hidden/Legacy containers to keep JS happy -->
+                <div class="play-controls" style="display:none;"></div>
+            </div>
+            
+            <div class="controls" style="display:none;"></div>
+            <div id="session-preset" class="session-preset" style="display:none;"></div>
+        </div>
+        
+        <div class="game-area">
+            <div class="game-main">
+                <canvas id="game-canvas" width="1024" height="768"></canvas>
+                <div id="click-trail" class="click-trail"></div>
+                <div id="lane-labels" class="lane-labels"></div>
+                <div id="encouragement-message" class="encouragement-message"></div>
+                <div id="pause-overlay" class="pause-overlay hidden">
+                    <h2>游戏已暂停</h2>
+                    <p>点击继续按钮恢复游戏</p>
+                </div>
+                
+                <!-- 游戏结果窗口 -->
+                <div id="game-result-overlay" class="game-result-overlay hidden">
+                    
+                    <!-- ===== 普通用户视图 ===== -->
+                    <div id="normal-result-view" class="result-content glass-panel">
+                        <!-- 专家模式按钮 - 右上角 -->
+                        <button id="post-session-btn" class="expert-mode-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                            专家模式
+                        </button>
+                        
+                        <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 20px;">
+                            <h2 style="margin: 0; display: flex; align-items: center; gap: 12px;">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                                    <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                                    <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                                </svg>
+                                游戏结束
+                            </h2>
+                        </div>
+                        <div class="result-stats">
+                            <div class="stat-item">
+                                <span class="stat-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                                </span>
+                                <span class="stat-label">成功击破</span>
+                                <span id="result-bubbles" class="stat-value">0</span>
+                                <span class="stat-unit">个泡泡</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                </span>
+                                <span class="stat-label">平均速度</span>
+                                <span id="result-speed" class="stat-value">0</span>
+                                <span class="stat-unit">秒/个</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 1 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+                                </span>
+                                <span class="stat-label">最高连击</span>
+                                <span id="result-combo" class="stat-value">0</span>
+                                <span class="stat-unit">连续</span>
+                            </div>
+                        </div>
+                        <div class="result-message">
+                            <p id="result-encouragement">太棒了！你的表现很出色！</p>
+                        </div>
+                        
+                        <div class="result-actions">
+                            <button id="play-music-btn" class="result-btn music">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M9 18V5l12-2v13"></path>
+                                    <circle cx="6" cy="18" r="3"></circle>
+                                    <circle cx="18" cy="16" r="3"></circle>
+                                </svg>
+                                播放
+                            </button>
+                            <button id="result-mute-btn" class="result-btn secondary panic-btn">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                                    <line x1="23" y1="9" x2="17" y2="15"></line>
+                                    <line x1="17" y1="9" x2="23" y2="15"></line>
+                                </svg>
+                                静音
+                            </button>
+                            <button id="play-again-btn" class="result-btn primary">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="23 4 23 10 17 10"></polyline>
+                                    <polyline points="1 20 1 14 7 14"></polyline>
+                                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                                </svg>
+                                重玩
+                            </button>
+                            <button id="finish-game-btn" class="result-btn secondary">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="9 11 12 14 22 4"></polyline>
+                                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                                </svg>
+                                结束
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- ===== 专家模式视图 (完全替换普通视图) ===== -->
+                    <div id="expert-result-view" class="expert-view hidden">
+                        <!-- 顶部栏 -->
+                        <div class="expert-header">
+                            <div class="expert-title">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                                <span>专家模式</span>
+                            </div>
+                            
+                            <button id="exit-expert-btn" class="expert-exit-btn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                                退出专家模式
+                            </button>
+                            <button id="refresh-expert-btn" class="expert-exit-btn" style="margin-left:8px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                                Export Session Report
+                            </button>
+                        </div>
+                        
+                        <!-- 主内容区 - 左右分栏 -->
+                        <div class="expert-content">
+                            <!-- 左侧：行为分析 -->
+                            <div class="expert-panel expert-left">
+                                <h3 class="expert-panel-title">行为模式分析</h3>
+                                
+                                <!-- 点击轨迹 -->
+                                <div class="expert-section">
+                                    <h4>点击轨迹</h4>
+                                    <div class="timeline-scatter" id="expert-timeline-scatter">
+                                        <div class="scatter-row" data-lane="C"><span class="scatter-label">C</span><div class="scatter-track"></div></div>
+                                        <div class="scatter-row" data-lane="D"><span class="scatter-label">D</span><div class="scatter-track"></div></div>
+                                        <div class="scatter-row" data-lane="E"><span class="scatter-label">E</span><div class="scatter-track"></div></div>
+                                        <div class="scatter-row" data-lane="G"><span class="scatter-label">G</span><div class="scatter-track"></div></div>
+                                        <div class="scatter-row" data-lane="A"><span class="scatter-label">A</span><div class="scatter-track"></div></div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 模式识别 -->
+                                <div class="expert-section">
+                                    <h4>模式识别</h4>
+                                    <div class="expert-pattern">
+                                        <div class="pattern-type" id="expert-pattern-type">
+                                            <span class="pattern-name">分析中...</span>
+                                        </div>
+                                        <p class="pattern-desc" id="expert-pattern-desc">等待游戏数据...</p>
+                                        
+                                        <div class="pattern-scores">
+                                            <div class="score-item">
+                                                <span class="score-label">
+                                                    顺序型
+                                                    <span class="bubble-tooltip-trigger">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
+                                                        <div class="bubble-tooltip">
+                                                            <div class="bubble-tooltip-content">
+                                                                <div class="tooltip-row">
+                                                                    <span class="tooltip-label">判定条件</span>
+                                                                    <span class="tooltip-threshold">顺序命中率 &gt; 40%</span>
+                                                                </div>
+                                                                <div class="tooltip-row">
+                                                                    <span class="tooltip-label">且</span>
+                                                                    <span class="tooltip-threshold">lane多样性 ≥ 4</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </span>
+                                                </span>
+                                                <div class="score-bar-bg"><div class="score-bar-fill seq" id="expert-score-seq"></div></div>
+                                                <span class="score-value" id="expert-score-seq-val">0%</span>
+                                            </div>
+                                            <div class="score-item">
+                                                <span class="score-label">
+                                                    重复型
+                                                    <span class="bubble-tooltip-trigger">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
+                                                        <div class="bubble-tooltip">
+                                                            <div class="bubble-tooltip-content">
+                                                                <div class="tooltip-row">
+                                                                    <span class="tooltip-label">判定条件</span>
+                                                                    <span class="tooltip-threshold">主导lane占比 &gt; 60%</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </span>
+                                                </span>
+                                                <div class="score-bar-bg"><div class="score-bar-fill rep" id="expert-score-rep"></div></div>
+                                                <span class="score-value" id="expert-score-rep-val">0%</span>
+                                            </div>
+                                            <div class="score-item">
+                                                <span class="score-label">
+                                                    探索型
+                                                    <span class="bubble-tooltip-trigger">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
+                                                        <div class="bubble-tooltip">
+                                                            <div class="bubble-tooltip-content">
+                                                                <div class="tooltip-row">
+                                                                    <span class="tooltip-label">判定条件</span>
+                                                                    <span class="tooltip-threshold">lane多样性 ≥ 4</span>
+                                                                </div>
+                                                                <div class="tooltip-row">
+                                                                    <span class="tooltip-label">且</span>
+                                                                    <span class="tooltip-threshold">主导lane ≤ 60%</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </span>
+                                                </span>
+                                                <div class="score-bar-bg"><div class="score-bar-fill exp" id="expert-score-exp"></div></div>
+                                                <span class="score-value" id="expert-score-exp-val">0%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 游戏统计 (一行显示) -->
+                                <div class="expert-section expert-stats-inline">
+                                    <h4>游戏统计</h4>
+                                    <div class="stats-inline">
+                                        <span>击破 <strong id="expert-bubbles">0</strong> 个</span>
+                                        <span class="stats-divider">|</span>
+                                        <span>速度 <strong id="expert-speed">0</strong>s/个</span>
+                                        <span class="stats-divider">|</span>
+                                        <span>连击 <strong id="expert-combo">0</strong></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 右侧：音乐参数调整 -->
+                            <div class="expert-panel expert-right">
+                                <h3 class="expert-panel-title">音乐参数调整</h3>
+                                
+                                <!-- 模式切换 -->
+                                <div class="param-mode-toggle">
+                                    <button id="param-mode-test" class="mode-btn active">测试模式</button>
+                                    <button id="param-mode-spectrum" class="mode-btn">Spectrogram</button>
+                                </div>
+                                <div class="param-presets" id="param-presets" style="margin:8px 0 12px 0; display:flex; gap:8px;">
+                                    <button class="mode-btn" data-preset="relaxed">Relaxed</button>
+                                    <button class="mode-btn active" data-preset="default">Default</button>
+                                    <button class="mode-btn" data-preset="tight">Tight</button>
+                                </div>
+                                
+                                <div class="music-params-grid">
+                                    <div class="param-item">
+                                        <label>
+                                            <span>节奏 (BPM) <span class="param-safe-range">安全: 60-80</span></span>
+                                            <span id="tempo-warning" class="param-warning-badge hidden">可能有感官过载风险</span>
+                                        </label>
+                                        <div class="param-control">
+                                            <input type="range" id="report-param-tempo" min="40" max="120" value="72" class="safe-range-slider">
+                                            <span id="report-param-tempo-value" class="param-value">72</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="param-item">
+                                        <label>
+                                            <span>Accent ratio <span class="param-safe-range">安全: 0-20%</span></span>
+                                            <span id="contrast-warning" class="param-warning-badge hidden">可能有感官过载风险</span>
+                                        </label>
+                                        <div class="param-control">
+                                            <input type="range" id="report-param-contrast" min="0" max="50" value="10" class="safe-range-slider">
+                                            <span id="report-param-contrast-value" class="param-value">10%</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="param-item">
+                                        <label>
+                                            <span>Gain <span class="param-safe-range">安全: -4.4–-1.9 dB</span></span>
+                                            <span id="volume-warning" class="param-warning-badge hidden">可能有感官过载风险</span>
+                                        </label>
+                                        <div class="param-control">
+                                            <input type="range" id="report-param-volume" min="0" max="100" value="70" class="safe-range-slider">
+                                            <span id="report-param-volume-value" class="param-value">-3.10 dB</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="param-item" id="harmony-param-item">
+                                        <label>
+                                            <span>音乐</span>
+                                            <span id="harmony-warning" class="param-warning-badge hidden">可能有感官过载风险</span>
+                                        </label>
+                                        <div class="harmony-options" id="harmony-options">
+                                            <button class="harmony-btn safe active" data-value="I-V">I-V</button>
+                                            <button class="harmony-btn unsafe" data-value="I-IV">I-IV</button>
+                                            <button class="harmony-btn unsafe" data-value="I-vi">I-vi</button>
+                                            <button class="harmony-btn unsafe" data-value="I-IV-V">I-IV-V</button>
+                                            <button class="harmony-btn unsafe" data-value="I-vi-IV-V">I-vi-IV-V</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="param-item" id="instrument-param-item">
+                                        <label>
+                                            <span>乐器</span>
+                                            <span id="instrument-warning" class="param-warning-badge hidden">可能有感官过载风险</span>
+                                        </label>
+                                        <div class="instrument-options" id="instrument-options">
+                                            <button class="instrument-btn active" data-value="piano">钢琴</button>
+                                            <button class="instrument-btn" data-value="epiano">电钢</button>
+                                            <button class="instrument-btn" data-value="guitar">吉他</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                
+                                
+                                <!-- 操作按钮 -->
+                                <div class="param-actions">
+                                    <button id="param-preview-btn" class="param-btn secondary">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                        预览
+                                    </button>
+                                    <button id="param-stop-btn" class="param-btn secondary">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+                                        暂停
+                                    </button>
+                                </div>
+                                
+                                
+                                
+                                <!-- 频谱分析区域 -->
+                                <div id="spectrum-analysis-area" class="spectrum-analysis-area hidden">
+                                    <div class="spectrum-canvas-wrapper">
+                                        <canvas id="spectrum-comparison-canvas" width="560" height="320"></canvas>
+                                    </div>
+                                    <div id="spectrum-caption" style="margin-top:8px; display:flex; gap:24px; justify-content:center; font-family: system-ui, Arial; font-size:12px; color:#0f172a;">
+                                        <div class="caption-col" style="display:flex; gap:10px; align-items:center;">
+                                            <span class="caption-title" style="font-weight:600;">(a) Baseline</span>
+                                            <span id="caption-baseline-lra" style="opacity:0.9;">LRA: --</span>
+                                            <span id="caption-baseline-bpm" style="opacity:0.9;">BPM: --</span>
+                                            <span id="caption-baseline-contrast" style="opacity:0.9;">Contrast: --</span>
+                                        </div>
+                                        <div class="caption-col" style="display:flex; gap:10px; align-items:center;">
+                                            <span class="caption-title" style="font-weight:600;">(b) Constraint-First</span>
+                                            <span id="caption-safe-lra" style="opacity:0.9;">LRA: --</span>
+                                            <span id="caption-safe-bpm" style="opacity:0.9;">BPM: --</span>
+                                            <span id="caption-safe-contrast" style="opacity:0.9;">Contrast: --</span>
+                                        </div>
+                                    </div>
+                                    <div class="spectrum-actions">
+                                        <button id="spectrum-generate-btn" class="param-btn primary">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                            Generate
+                                        </button>
+                                        <button id="spectrum-import-json-btn" class="param-btn secondary">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"></path><path d="M5 12l7 7 7-7"></path></svg>
+                                            Import JSON
+                                        </button>
+                                        <button id="spectrum-export-png-btn" class="param-btn secondary">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                            Export SVG
+                                        </button>
+                                        <button id="spectrum-export-json-btn" class="param-btn secondary">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                            Export JSON
+                                        </button>
+                                        <button id="spectrum-export-fulljson-btn" class="param-btn secondary">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="8" y1="7" x2="16" y2="7"></line><line x1="8" y1="11" x2="16" y2="11"></line><line x1="8" y1="15" x2="16" y2="15"></line></svg>
+                                            Export Full JSON
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+        <!-- 右侧实时监控面板 -->
+        <div id="game-sidebar" class="game-sidebar">
+            <div class="sidebar-header">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="M18 17V9"></path><path d="M13 17V5"></path><path d="M8 17v-3"></path></svg>
+                <span class="sidebar-title">实时监控</span>
+                <button id="sidebar-toggle-btn" class="sidebar-toggle-btn" title="展开/收起">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+            </div>
+            
+            <div class="sidebar-content">
+                <!-- 实时数据 -->
+                <div class="sidebar-section">
+                    <h4 class="section-title">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                        实时数据
+                    </h4>
+                    <div class="debug-mini-stats">
+                        <div class="mini-stat">
+                            <span class="mini-label">点击数</span>
+                            <span id="rt-clicks" class="mini-value">0</span>
+                        </div>
+                        <div class="mini-stat">
+                            <span class="mini-label">主导Lane</span>
+                            <span id="rt-dominant" class="mini-value">-</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Lane 分布 -->
+                <div class="sidebar-section">
+                    <h4 class="section-title">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                        Lane 分布
+                    </h4>
+                    <div id="rt-lane-bars" class="rt-lane-bars">
+                        <div class="lane-bar" data-lane="1" style="--lane-color: #F87171;"><span>C</span></div>
+                        <div class="lane-bar" data-lane="2" style="--lane-color: #FB923C;"><span>D</span></div>
+                        <div class="lane-bar" data-lane="3" style="--lane-color: #FBBF24;"><span>E</span></div>
+                        <div class="lane-bar" data-lane="4" style="--lane-color: #60A5FA;"><span>G</span></div>
+                        <div class="lane-bar" data-lane="5" style="--lane-color: #A78BFA;"><span>A</span></div>
+                    </div>
+                </div>
+                
+                <!-- 模式预测 -->
+                <div class="sidebar-section">
+                    <h4 class="section-title">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                        模式预测
+                        <span class="bubble-tooltip-trigger">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
+                            <div class="bubble-tooltip bubble-tooltip-right">
+                                <div class="bubble-tooltip-content">
+                                    <div class="tooltip-row">
+                                        <span class="tooltip-label">顺序型</span>
+                                        <span class="tooltip-threshold">命中率 &gt; 40% 且 lane ≥ 4</span>
+                                    </div>
+                                    <div class="tooltip-row">
+                                        <span class="tooltip-label">重复型</span>
+                                        <span class="tooltip-threshold">主导lane &gt; 60%</span>
+                                    </div>
+                                    <div class="tooltip-row">
+                                        <span class="tooltip-label">探索型</span>
+                                        <span class="tooltip-threshold">lane ≥ 4 且 主导 ≤ 60%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </span>
+                    </h4>
+                    <div id="rt-pattern" class="rt-pattern">
+                        <span class="pattern-label">等待更多数据...</span>
+                    </div>
+                </div>
+                
+                <!-- 最近点击 -->
+                <div class="sidebar-section">
+                    <h4 class="section-title">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                        最近点击
+                    </h4>
+                    <div id="rt-recent-clicks" class="rt-recent-clicks">
+                        <span class="no-data">暂无</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+        
+        <div class="game-footer">
+            <div class="instructions">
+                <p style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <circle cx="12" cy="12" r="6"></circle>
+                        <circle cx="12" cy="12" r="2"></circle>
+                    </svg>
+                    移动光标戳泡泡
+                </p>
+                <div class="status-display" style="display: flex; gap: 20px; justify-content: center; margin: 10px 0;">
+                    <div class="status-item">
+                        <span>输入方式: </span>
+                        <span id="input-mode-footer" style="font-weight: 600; color: var(--accent-primary);">鼠标</span>
+                    </div>
+                    <div class="status-item">
+                        <span>泡泡数: </span>
+                        <span id="bubble-count-footer" style="font-weight: 600; color: var(--accent-success);">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Session Settings Modal -->
+    <div id="session-settings-modal" class="settings-modal hidden">
+        <div class="settings-panel">
+            <div class="settings-header">
+                <h2>游戏设置</h2>
+                <p class="settings-subtitle">调整感官体验，让游戏更适合你</p>
+            </div>
+            
+            <div class="settings-scroll-area">
+                <div class="settings-grid-new">
+                    <!-- 音量大小 -->
+                    <div class="settings-field-new">
+                        <label class="settings-label-with-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                            <span>音量</span>
+                        </label>
+                        <div class="segmented-control" data-field="session-volume">
+                            <button type="button" class="segment" data-value="low" title="柔和">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon></svg>
+                                <span>柔和</span>
+                            </button>
+                            <button type="button" class="segment active" data-value="medium" title="标准">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                                <span>标准</span>
+                            </button>
+                            <button type="button" class="segment" data-value="high" title="响亮">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                                <span>响亮</span>
+                            </button>
+                        </div>
+                        <input type="hidden" id="session-volume" value="medium">
+                    </div>
+
+                    <!-- 乐器音色 -->
+                    <div class="settings-field-new">
+                        <label class="settings-label-with-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                            <span>音色</span>
+                        </label>
+                        <div class="segmented-control" data-field="session-timbre">
+                            <button type="button" class="segment active" data-value="piano" title="钢琴">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg>
+                                <span>钢琴</span>
+                            </button>
+                            <button type="button" class="segment" data-value="epiano" title="电钢">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M6 12h.01M10 12h.01M14 12h.01M18 12h.01"></path></svg>
+                                <span>电钢</span>
+                            </button>
+                            <button type="button" class="segment" data-value="guitar" title="吉他">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                                <span>吉他</span>
+                            </button>
+                        </div>
+                        <input type="hidden" id="session-timbre" value="piano">
+                    </div>
+
+                    <!-- 声音延迟 -->
+                    <div class="settings-field-new">
+                        <label class="settings-label-with-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            <span>延迟</span>
+                        </label>
+                        <div class="segmented-control" data-field="session-latency">
+                            <button type="button" class="segment active" data-value="0" title="即时">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                <span>即时</span>
+                            </button>
+                            <button type="button" class="segment" data-value="500" title="稍慢">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                <span>稍慢</span>
+                            </button>
+                        </div>
+                        <input type="hidden" id="session-latency" value="0">
+                    </div>
+
+                    <!-- 点击反馈 -->
+                    <div class="settings-field-new">
+                        <label class="settings-label-with-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            <span>反馈音效</span>
+                        </label>
+                        <div class="segmented-control" data-field="session-immediate">
+                            <button type="button" class="segment active" data-value="full" title="开启">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <span>开启</span>
+                            </button>
+                            <button type="button" class="segment" data-value="off" title="关闭">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>
+                                <span>关闭</span>
+                            </button>
+                        </div>
+                        <input type="hidden" id="session-immediate" value="full">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 隐藏的默认值字段 -->
+            <input type="hidden" id="session-density" value="normal">
+            <input type="hidden" id="session-reward" value="on">
+
+            <div class="settings-actions">
+                <button id="session-reset-btn" class="result-btn secondary small">恢复默认</button>
+                <button id="session-start-btn" class="result-btn primary small">开始游戏</button>
+                <button id="session-close-btn" class="result-btn secondary small">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/i18n.js"></script>
+    <script src="js/audio-notes.js"></script>
+    <script src="js/audio-engine.js"></script>
+    <script src="js/note-log.js"></script>
+    <script src="js/advanced-music-generator.js"></script>
+    <script src="js/spectrogram-comparison.js"></script>
+    <script src="js/autism-friendly-features.js"></script>
+    
+    <!-- Expert Audit Mode Scripts -->
+    <script src="js/safety-envelope.js"></script>
+    <script src="js/session-logger.js"></script>
+    <script src="js/expert-drawer.js"></script>
+    <script src="js/audit-dashboard.js"></script>
+    <script src="js/sidebar-controller.js"></script>
+
+    <script src="js/game-result-manager.js"></script>
+    <script src="js/music-param-controller.js"></script>
+    <script src="js/game-integration.js"></script>
+    <script src="js/debug-collision.js"></script>
+
+    <script src="js/bubble-manager.js"></script>
+    <script src="js/collision-detector.js"></script>
+    <script src="js/game-engine.js"></script>
+
+  
+    <!-- TFJS & Magenta -->
+    <script src="/vendor/tf/tf.min.js"></script>
+    <script src="/vendor/magenta/music.js"></script>
+
+    <!-- 入口保持 module -->
+    <script type="module" src="./js/main.js"></script>
+</body>
+</html>
