@@ -104,7 +104,7 @@ The `envelope-diagnostic/` directory contains diagnostic and analysis tools for 
 | Parameter | Relaxed | Default | Tight |
 |-----------|---------|---------|-------|
 | Tempo (BPM) | 60–180 | 120–130 | 124–126 |
-| Gain | 0.0–1.0 | 0.3–0.8 | 0.45–0.55 |
+| Gain (dB) | −60–0 | −10.5–−1.9 | −6.9–−5.2 |
 | Accent ratio | 0.0–1.0 | 0.0–0.5 | 0.0–0.1 | 
 ### Usage
 
