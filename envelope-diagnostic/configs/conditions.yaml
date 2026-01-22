@@ -1,0 +1,20 @@
+conditions:
+  baseline:
+    enforcer: off
+    audit_log: off
+  constrained_default:
+    enforcer: on
+    audit_log: on
+    envelope: envelopes/default.json
+  constrained_tight:
+    enforcer: on
+    audit_log: on
+    envelope: envelopes/tight.json
+  constrained_relaxed:
+    enforcer: on
+    audit_log: on
+    envelope: envelopes/relaxed.json
+  constrained_ultra_tight:
+    enforcer: on
+    audit_log: on
+    envelope: envelopes/ultra_tight.json

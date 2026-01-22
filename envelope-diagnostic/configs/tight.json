@@ -1,0 +1,5 @@
+{
+  "tempo_bpm": { "min": 124, "max": 126 },
+  "gain": { "min": 0.45, "max": 0.55, "unit": "linear" },
+  "accent_ratio": { "min": 0.0, "max": 0.1 }
+}
